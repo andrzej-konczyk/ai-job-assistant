@@ -30,6 +30,8 @@ from cv_qa import (
     ask_about_cv,
     classify_cv,
     extract_skills_with_llm,
+    extract_job_skills,
+    analyze_job_fit,
     generate_career_path,
     generate_recommendations,
 )
@@ -337,11 +339,12 @@ m4.metric("Skills on CV",      len(cv_skills))
 st.divider()
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🏆 Job Matches",
     "🔍 Skill Gaps",
     "🚀 Career Path",
     "💬 AI Chat",
+    "📋 Analyze a Job",
 ])
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -556,3 +559,123 @@ with tab4:
         if st.button("🗑️ Clear chat", type="secondary"):
             st.session_state.chat_history = []
             st.rerun()
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TAB 5 — Analyze a Job
+# ═══════════════════════════════════════════════════════════════════════════════
+with tab5:
+    st.markdown(
+        "Paste any job offer below — from LinkedIn, a company website, or anywhere else. "
+        "Get your **fit score**, **skill gap**, and **AI feedback** tailored to that specific role."
+    )
+
+    job_input = st.text_area(
+        "Job offer text",
+        height=260,
+        placeholder=(
+            "Paste the full job description here…\n\n"
+            "e.g.:\n"
+            "Senior Data Engineer — Acme Corp\n\n"
+            "We are looking for a Data Engineer to build and maintain our data platform…\n"
+            "Requirements:\n- 3+ years Python\n- Experience with Airflow, dbt, Snowflake\n- ..."
+        ),
+        key="job_offer_input",
+    )
+
+    col_btn, col_clear = st.columns([1, 5])
+    run_analysis = col_btn.button("🔍 Analyze fit", type="primary", disabled=not job_input.strip())
+    if col_clear.button("Clear", type="secondary") and "job_analysis" in st.session_state:
+        del st.session_state["job_analysis"]
+        st.rerun()
+
+    # Run & cache analysis
+    if run_analysis and job_input.strip():
+        with st.spinner("Extracting skills from job offer…"):
+            job_skills = extract_job_skills(job_input, anthropic_key)
+
+        with st.spinner("Computing match score…"):
+            job_emb_single = model.encode(job_input, convert_to_tensor=True)
+            raw_score = float(util.cos_sim(cv_emb, job_emb_single).item())
+
+        with st.spinner("Finding skill gaps…"):
+            job_missing = find_missing_skills(cv_text, job_skills, model, threshold)
+            job_matched = [s for s in job_skills if s not in job_missing]
+
+        ai_feedback = None
+        if has_key:
+            with st.spinner("Generating AI feedback with Claude…"):
+                try:
+                    ai_feedback = analyze_job_fit(cv_text, job_input, job_missing, raw_score, anthropic_key)
+                except Exception as e:
+                    ai_feedback = f"⚠️ API error: {e}"
+
+        st.session_state.job_analysis = {
+            "score":     raw_score,
+            "skills":    job_skills,
+            "missing":   job_missing,
+            "matched":   job_matched,
+            "feedback":  ai_feedback,
+        }
+
+    # Render results
+    if "job_analysis" in st.session_state:
+        r = st.session_state.job_analysis
+        score = r["score"]
+
+        st.divider()
+
+        # ── Score banner ──────────────────────────────────────────────────
+        if score >= 0.72:
+            color, label = "#16a34a", "Strong match"
+        elif score >= 0.55:
+            color, label = "#d97706", "Good match"
+        else:
+            color, label = "#dc2626", "Partial match"
+
+        st.markdown(f"""
+<div style="border-radius:14px;padding:20px 26px;background:{color}18;
+     border-left:6px solid {color};margin-bottom:18px;color:#0f172a;">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:1.05rem;font-weight:700;color:{color};">{label}</span>
+    <span style="font-size:2.2rem;font-weight:900;color:{color};">{score:.0%}</span>
+  </div>
+  <div style="font-size:.88rem;color:#64748b;margin-top:4px;">
+    Semantic similarity between your CV and this job offer
+  </div>
+</div>""", unsafe_allow_html=True)
+
+        # ── Skill pills ───────────────────────────────────────────────────
+        col_m, col_h = st.columns(2)
+
+        with col_m:
+            st.markdown("**Missing skills**")
+            if r["missing"]:
+                pills = "".join(
+                    f'<span class="pill pill-missing">✗ {html.escape(s)}</span>'
+                    for s in r["missing"]
+                )
+                st.markdown(pills, unsafe_allow_html=True)
+            else:
+                st.success("✓ No missing skills detected")
+
+        with col_h:
+            st.markdown("**Skills you already have**")
+            if r["matched"]:
+                pills = "".join(
+                    f'<span class="pill pill-have">✓ {html.escape(s)}</span>'
+                    for s in r["matched"]
+                )
+                st.markdown(pills, unsafe_allow_html=True)
+            else:
+                st.info("No skill matches detected")
+
+        # ── AI Feedback ───────────────────────────────────────────────────
+        st.divider()
+        if r["feedback"]:
+            st.markdown("**AI Feedback**")
+            st.markdown(
+                f'<div class="ai-answer">🤖 {html.escape(r["feedback"])}</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.info("Add your Anthropic API key in the sidebar for detailed AI feedback on this job.")

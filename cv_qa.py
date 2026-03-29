@@ -174,3 +174,74 @@ def generate_recommendations(
             )
         bullets = [f"• Learn **{s}** and add a concrete project to your CV that demonstrates it." for s in missing_skills[:5]]
         return "\n".join(bullets)
+
+
+# ── Job offer analysis ────────────────────────────────────────────────────────
+
+def extract_job_skills(job_text: str, api_key: str) -> list[str]:
+    """
+    Extract required skills from a raw job offer text using Claude.
+    Falls back to regex extraction if the API call fails or no key provided.
+    """
+    if not api_key:
+        from matching import extract_skills_from_text
+        return extract_skills_from_text(job_text)
+
+    system = (
+        "You are a job offer parser. Extract all required and preferred skills from the job posting. "
+        "Return ONLY a comma-separated list — no numbering, no explanations. "
+        "Include: technical tools, languages, frameworks, methodologies, certifications, soft skills."
+    )
+    prompt = f"<job>\n{job_text[:4000]}\n</job>\n\nRequired skills (comma-separated):"
+    try:
+        raw = _call_claude(system, prompt, api_key, max_tokens=400)
+        return [s.strip() for s in raw.split(",") if s.strip()]
+    except Exception:
+        from matching import extract_skills_from_text
+        return extract_skills_from_text(job_text)
+
+
+def analyze_job_fit(
+    cv_text: str,
+    job_text: str,
+    missing_skills: list[str],
+    match_score: float,
+    api_key: str,
+) -> str:
+    """
+    Generate detailed, structured feedback on how well the CV fits a specific job offer.
+    Returns formatted text with sections: Overall Fit, Strengths, Gaps, CV Improvements.
+    Falls back to a template response if the API call fails.
+    """
+    system = (
+        "You are a senior career coach reviewing a CV against a specific job offer. "
+        "Structure your response with these exact sections:\n"
+        "**Overall Fit** — 2 sentences on the match.\n"
+        "**Key Strengths** — 3 bullet points (what aligns well).\n"
+        "**Critical Gaps** — 3 bullet points (what's missing or weak).\n"
+        "**CV Improvements** — 3 specific rewrites or additions to target this role.\n"
+        "Be direct and specific. Under 350 words total."
+    )
+    skills_str = ", ".join(missing_skills[:10]) if missing_skills else "none identified"
+    prompt = (
+        f"Match score: {match_score:.0%}\n"
+        f"Missing skills: {skills_str}\n\n"
+        f"<job>\n{job_text[:2000]}\n</job>\n\n"
+        f"<cv>\n{cv_text[:2000]}\n</cv>"
+    )
+    try:
+        return _call_claude(system, prompt, api_key, max_tokens=600)
+    except Exception:
+        if missing_skills:
+            gaps = "\n".join(f"• {s}" for s in missing_skills[:3])
+        else:
+            gaps = "• No major gaps detected"
+        return (
+            f"**Overall Fit** — Match score: {match_score:.0%}. "
+            f"{'Strong alignment with the job requirements.' if match_score >= 0.7 else 'Partial alignment — some gaps to address.'}\n\n"
+            f"**Critical Gaps**\n{gaps}\n\n"
+            f"**CV Improvements**\n"
+            "• Tailor your summary section to mirror the job title and key requirements.\n"
+            "• Add measurable achievements relevant to the role (numbers, %, impact).\n"
+            "• Include missing skills through projects or certifications."
+        )

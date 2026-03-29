@@ -1,0 +1,102 @@
+job_offers = [
+    {
+        "title": "Data Analyst",
+        "description": "Analyze business data to uncover trends and support decision-making. Build dashboards and reports for stakeholders across departments.",
+        "required_skills": ["SQL", "Excel", "Tableau", "Python", "Statistical Analysis"]
+    },
+    {
+        "title": "Senior Data Analyst",
+        "description": "Lead analytics projects end-to-end, mentor junior analysts, and work closely with product and engineering teams to define KPIs.",
+        "required_skills": ["SQL", "Python", "Power BI", "A/B Testing", "Data Modeling"]
+    },
+    {
+        "title": "Data Scientist",
+        "description": "Build predictive models and machine learning pipelines to solve business problems. Collaborate with engineering to deploy models to production.",
+        "required_skills": ["Python", "Machine Learning", "Scikit-learn", "SQL", "Statistics"]
+    },
+    {
+        "title": "Senior Data Scientist",
+        "description": "Drive ML strategy, design experiments, and develop advanced models for recommendation and personalization systems.",
+        "required_skills": ["Python", "Deep Learning", "TensorFlow", "MLflow", "Feature Engineering"]
+    },
+    {
+        "title": "Machine Learning Engineer",
+        "description": "Design, build, and maintain ML infrastructure and pipelines. Package and serve models at scale in cloud environments.",
+        "required_skills": ["Python", "MLOps", "Docker", "Kubernetes", "AWS SageMaker"]
+    },
+    {
+        "title": "Data Engineer",
+        "description": "Build and maintain scalable data pipelines and warehouse infrastructure. Ensure data quality and availability across the organization.",
+        "required_skills": ["Python", "SQL", "Apache Spark", "Airflow", "dbt"]
+    },
+    {
+        "title": "Senior Data Engineer",
+        "description": "Architect data platforms and lead migration of legacy pipelines to modern cloud-native solutions. Mentor junior engineers.",
+        "required_skills": ["Spark", "Kafka", "Snowflake", "Terraform", "Python"]
+    },
+    {
+        "title": "Analytics Engineer",
+        "description": "Transform raw data into clean, well-documented datasets. Own the analytics layer using dbt and work closely with analysts and scientists.",
+        "required_skills": ["dbt", "SQL", "Snowflake", "Python", "Data Modeling"]
+    },
+    {
+        "title": "Business Intelligence Developer",
+        "description": "Develop and maintain BI dashboards and data models. Translate business requirements into actionable reports for leadership.",
+        "required_skills": ["Power BI", "SQL", "DAX", "Data Warehousing", "Excel"]
+    },
+    {
+        "title": "Data Science Manager",
+        "description": "Lead a team of data scientists, set roadmap priorities, and align ML initiatives with business goals. Present findings to C-level stakeholders.",
+        "required_skills": ["Python", "Machine Learning", "Team Leadership", "Stakeholder Management", "SQL"]
+    },
+    {
+        "title": "NLP Engineer",
+        "description": "Develop natural language processing models for text classification, entity extraction, and conversational AI applications.",
+        "required_skills": ["Python", "NLP", "Transformers", "HuggingFace", "spaCy"]
+    },
+    {
+        "title": "Computer Vision Engineer",
+        "description": "Build and deploy image recognition and object detection models for industrial and consumer-facing applications.",
+        "required_skills": ["Python", "PyTorch", "OpenCV", "YOLO", "CNNs"]
+    },
+    {
+        "title": "Quantitative Analyst",
+        "description": "Develop statistical and mathematical models for financial risk assessment, pricing, and algorithmic trading strategies.",
+        "required_skills": ["Python", "R", "Statistics", "Time Series", "Financial Modeling"]
+    },
+    {
+        "title": "Data Architect",
+        "description": "Design enterprise-wide data architecture including data lakes, warehouses, and governance frameworks. Define data standards and best practices.",
+        "required_skills": ["Data Modeling", "SQL", "Cloud Platforms", "Data Governance", "ETL Design"]
+    },
+    {
+        "title": "MLOps Engineer",
+        "description": "Build CI/CD pipelines for machine learning models, monitor model drift, and ensure reliable model deployment and retraining workflows.",
+        "required_skills": ["MLflow", "Docker", "Kubernetes", "Python", "CI/CD"]
+    },
+    {
+        "title": "Data Governance Analyst",
+        "description": "Establish and enforce data quality standards, metadata management, and compliance policies across the data platform.",
+        "required_skills": ["Data Governance", "SQL", "Collibra", "Data Quality", "GDPR"]
+    },
+    {
+        "title": "Research Scientist – AI",
+        "description": "Conduct cutting-edge research in deep learning and publish findings. Prototype novel architectures and advance the company's AI capabilities.",
+        "required_skills": ["Python", "PyTorch", "Research", "Mathematics", "Deep Learning"]
+    },
+    {
+        "title": "Product Analyst",
+        "description": "Analyze user behavior and product metrics to guide product decisions. Design and evaluate A/B tests across the product lifecycle.",
+        "required_skills": ["SQL", "Python", "A/B Testing", "Google Analytics", "Data Visualization"]
+    },
+    {
+        "title": "Data Platform Engineer",
+        "description": "Build and operate the internal data platform used by analysts, scientists, and engineers. Focus on reliability, scalability, and developer experience.",
+        "required_skills": ["Python", "Spark", "Databricks", "AWS", "Infrastructure as Code"]
+    },
+    {
+        "title": "AI/ML Product Manager",
+        "description": "Define the roadmap for AI-powered product features. Work cross-functionally with data science, engineering, and design to ship ML-driven experiences.",
+        "required_skills": ["Product Management", "Machine Learning Fundamentals", "SQL", "Agile", "Stakeholder Communication"]
+    },
+]

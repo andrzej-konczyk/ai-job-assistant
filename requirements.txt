@@ -1,0 +1,8 @@
+streamlit==1.55.0
+pandas
+sentence-transformers
+scikit-learn
+pdfplumber
+anthropic
+requests
+pytest
